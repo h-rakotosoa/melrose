@@ -1,38 +1,81 @@
-import { Card } from '@app/contracts/ui.contract';
+import { useState, useEffect } from 'react';
+import { Card, Loader } from '@app/contracts/ui.contract';
 import { DashboardHeader } from './components/DashboardHeader';
 import { Users, Activity, TrendingUp, Database } from 'lucide-react';
+import { dashboardService, DashboardStat, DashboardActivity } from '../../services/dashboard.service';
 
 export const DashboardPage = () => {
-  const stats = [
-    {
-      label: 'Total Users',
-      value: '2,543',
-      icon: Users,
-      change: '+12%',
-      trend: 'up',
-    },
-    {
-      label: 'Active Sessions',
-      value: '1,234',
-      icon: Activity,
-      change: '+5%',
-      trend: 'up',
-    },
-    {
-      label: 'Growth Rate',
-      value: '23.5%',
-      icon: TrendingUp,
-      change: '+2.5%',
-      trend: 'up',
-    },
-    {
-      label: 'Data Usage',
-      value: '45.2 GB',
-      icon: Database,
-      change: '-3%',
-      trend: 'down',
-    },
-  ];
+  const [stats, setStats] = useState<DashboardStat[]>([]);
+  const [activities, setActivities] = useState<DashboardActivity[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
+
+  const loadDashboardData = async () => {
+    try {
+      setIsLoading(true);
+      const data = await dashboardService.getDashboardData();
+      setStats(data.stats);
+      setActivities(data.recentActivities);
+    } catch (error) {
+      console.error('Failed to load dashboard data:', error);
+      setStats([
+        {
+          label: 'Total Users',
+          value: '2,543',
+          icon: Users,
+          change: '+12%',
+          trend: 'up',
+        },
+        {
+          label: 'Active Sessions',
+          value: '1,234',
+          icon: Activity,
+          change: '+5%',
+          trend: 'up',
+        },
+        {
+          label: 'Growth Rate',
+          value: '23.5%',
+          icon: TrendingUp,
+          change: '+2.5%',
+          trend: 'up',
+        },
+        {
+          label: 'Data Usage',
+          value: '45.2 GB',
+          icon: Database,
+          change: '-3%',
+          trend: 'down',
+        },
+      ]);
+      setActivities([
+        {
+          action: 'User registered',
+          user: 'john.doe@example.com',
+          time: '2 minutes ago',
+        },
+        {
+          action: 'Data exported',
+          user: 'jane.smith@example.com',
+          time: '15 minutes ago',
+        },
+        {
+          action: 'Settings updated',
+          user: 'admin@melrose.com',
+          time: '1 hour ago',
+        },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isLoading) {
+    return <Loader />;
+  }
 
   return (
     <div>
@@ -72,23 +115,7 @@ export const DashboardPage = () => {
             Recent Activity
           </h2>
           <div className="space-y-4">
-            {[
-              {
-                action: 'User registered',
-                user: 'john.doe@example.com',
-                time: '2 minutes ago',
-              },
-              {
-                action: 'Data exported',
-                user: 'jane.smith@example.com',
-                time: '15 minutes ago',
-              },
-              {
-                action: 'Settings updated',
-                user: 'admin@melrose.com',
-                time: '1 hour ago',
-              },
-            ].map((activity, index) => (
+            {activities.map((activity, index) => (
               <div
                 key={index}
                 className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-gray-50 rounded-lg gap-2"
