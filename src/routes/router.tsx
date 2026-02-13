@@ -5,10 +5,12 @@ import { moduleRegistry } from '@app/utils/moduleRegistry';
 import { authModule } from '@modules/auth';
 import { dashboardModule } from '@modules/dashboard';
 import { usersModule } from '@modules/users';
+import { hotelModule } from '@modules/hotel';
 
 moduleRegistry.registerLocalModule('auth', authModule);
 moduleRegistry.registerLocalModule('dashboard', dashboardModule);
 moduleRegistry.registerLocalModule('users', usersModule);
+moduleRegistry.registerLocalModule('hotel', hotelModule);
 
 export const AppRouter = () => {
   const allRoutes = moduleRegistry.getAllRoutes();
